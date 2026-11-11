@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Galería y tienda de esculturas originales. Piezas únicas con envío asegurado a Europa.">
-    <title>Agustín Pérez | Galería de Escultura , Surrealismo Pop </title>
+    <title>Valeria Vance | Galería de Escultura Contemporánea</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -597,7 +597,7 @@
                 </div>
                 <div>
                     <h3 id="edit-modal-title" class="font-serif text-2xl font-bold text-stone-900">Editar Escultura</h3>
-                    <p class="text-xs text-stone-500">Modifica los datos, precios, fotos (varias URLs separadas por coma) o estado.</p>
+                    <p class="text-xs text-stone-500">Modifica los datos, precios, fotos, portes y embalaje específico.</p>
                 </div>
             </div>
 
@@ -610,7 +610,7 @@
                         <input type="text" id="edit-title" required class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-stone-700 mb-1">Precio en Euros (€)</label>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Precio de la Obra (€)</label>
                         <input type="number" step="0.01" id="edit-price" required class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
                     </div>
                     <div>
@@ -621,6 +621,42 @@
                             <option value="sold">Colección Privada / Vendida</option>
                         </select>
                     </div>
+
+                    <!-- CAMPOS DE ENVÍO Y EMBALAJE POR OBRA -->
+                    <div class="p-3 bg-amber-50/60 border border-amber-200 rounded-lg sm:col-span-2 space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900"><i class="fa-solid fa-truck-ramp-box mr-1"></i> Costes de Envío según Destino y Embalaje</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-stone-700 mb-1">🇪🇸 España (€)</label>
+                                <input type="number" step="0.01" id="edit-shipping-es" placeholder="0" class="w-full px-2 py-1 bg-white border border-stone-300 rounded text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-stone-700 mb-1">🇪🇺 Europa (€)</label>
+                                <input type="number" step="0.01" id="edit-shipping-eu" placeholder="0" class="w-full px-2 py-1 bg-white border border-stone-300 rounded text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-stone-700 mb-1">🇬🇧 Reino Unido (€)</label>
+                                <input type="number" step="0.01" id="edit-shipping-uk" placeholder="0" class="w-full px-2 py-1 bg-white border border-stone-300 rounded text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-stone-700 mb-1">🇺🇸 EEUU (€)</label>
+                                <input type="number" step="0.01" id="edit-shipping-us" placeholder="0" class="w-full px-2 py-1 bg-white border border-stone-300 rounded text-xs">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-stone-700 mb-1">Embalaje Específico (€)</label>
+                                <input type="number" step="0.01" id="edit-packaging" placeholder="0" class="w-full px-3 py-1.5 bg-white border border-stone-300 rounded-md text-sm">
+                            </div>
+                            <div class="flex items-end pb-1">
+                                <label for="edit-shipping-notice" class="flex items-center space-x-2 text-xs font-semibold text-amber-900 cursor-pointer">
+                                    <input type="checkbox" id="edit-shipping-notice" class="rounded text-amber-600 focus:ring-amber-500 w-4 h-4">
+                                    <span>Mostrar aviso "Envío/embalaje no incluido"</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Técnica / Materiales</label>
                         <input type="text" id="edit-tech" required placeholder="Ej. Bronce con pátina" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
@@ -642,7 +678,7 @@
                         <input type="text" id="edit-base" required placeholder="Ej. Mármol negro Marquina" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-stone-700 mb-1">Fotos (URLs separadas por comas para varios ángulos)</label>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Fotos (URLs separadas por comas)</label>
                         <input type="text" id="edit-image" required placeholder="https://foto1.jpg, https://foto2.jpg" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
                     </div>
                     <div class="sm:col-span-2">
@@ -665,7 +701,7 @@
         </div>
     </div>
 
-    <!-- PANEL CARRITO DE COMPRAS CON PASARELA DE PAGO (BIZUM / PAYPAL / TRANSFERENCIA) -->
+    <!-- PANEL CARRITO DE COMPRAS CON DESGLOSE POR PIEZA Y DESTINO -->
     <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
         <div class="p-6 border-b border-stone-200 flex justify-between items-center bg-stone-50">
             <h4 class="font-serif text-xl font-bold text-stone-900">Reserva y Compra</h4>
@@ -677,32 +713,39 @@
             <!-- Items de la lista -->
         </div>
         <div class="p-6 border-t border-stone-200 bg-stone-50 space-y-3">
-            <!-- DESGLOSE DE GASTOS Y ENVÍO -->
+            <!-- SELECTOR DE DESTINO DE ENVÍO -->
+            <div class="bg-white p-3 rounded-lg border border-stone-200 space-y-1.5">
+                <label for="cart-destination" class="block text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center justify-between">
+                    <span><i class="fa-solid fa-earth-americas mr-1 text-amber-700"></i> Destino del Envío</span>
+                </label>
+                <select id="cart-destination" onchange="updateCartUI()" class="w-full px-3 py-1.5 text-xs bg-stone-50 border border-stone-300 rounded-md font-medium text-stone-800 focus:ring-1 focus:ring-stone-900">
+                    <option value="es">🇪🇸 España (Península e Islas)</option>
+                    <option value="eu" selected>🇪🇺 Europa (Unión Europea)</option>
+                    <option value="uk">🇬🇧 Reino Unido (UK)</option>
+                    <option value="us">🇺🇸 Estados Unidos (EEUU)</option>
+                </select>
+            </div>
+
+            <!-- DESGLOSE DE GASTOS Y ENVÍO RECALCULADO DINÁMICAMENTE -->
             <div class="space-y-2 border-b border-stone-200 pb-3 text-xs text-stone-600">
                 <div class="flex justify-between font-medium">
                     <span>Subtotal Obras:</span>
                     <span id="cart-subtotal">0 €</span>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span>Gastos de Envío / Portes (Europa):</span>
-                    <div class="flex items-center space-x-1">
-                        <input type="number" id="cart-shipping-cost" value="0" min="0" step="5" onchange="updateCartUI()" oninput="updateCartUI()" class="w-16 px-1.5 py-0.5 border border-stone-300 rounded text-right font-medium text-xs">
-                        <span>€</span>
-                    </div>
+                <div class="flex justify-between items-center text-stone-700">
+                    <span>Envío / Portes según destino:</span>
+                    <span id="cart-shipping-total" class="font-medium text-stone-900">0 €</span>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span>Embalaje Estándar:</span>
-                    <div class="flex items-center space-x-1">
-                        <input type="number" id="cart-packaging-cost" value="0" min="0" step="5" onchange="updateCartUI()" oninput="updateCartUI()" class="w-16 px-1.5 py-0.5 border border-stone-300 rounded text-right font-medium text-xs">
-                        <span>€</span>
-                    </div>
+                <div class="flex justify-between items-center text-stone-700">
+                    <span>Embalaje específico de piezas:</span>
+                    <span id="cart-packaging-total" class="font-medium text-stone-900">0 €</span>
                 </div>
-                <div class="flex justify-between items-center pt-1">
+                <div class="flex justify-between items-center pt-1 border-t border-stone-200/60">
                     <label for="cart-special-box" class="flex items-center space-x-1.5 cursor-pointer select-none">
                         <input type="checkbox" id="cart-special-box" onchange="updateCartUI()" class="rounded text-amber-600 focus:ring-amber-500 w-3.5 h-3.5">
-                        <span class="text-stone-700 font-medium">Caja de Madera Reforzada (Especial):</span>
+                        <span class="text-stone-700 font-medium">Caja de Madera Reforzada:</span>
                     </label>
-                    <span id="cart-special-box-price" class="font-medium text-stone-800">45 €</span>
+                    <span id="cart-special-box-price" class="font-medium text-stone-800">+45 €</span>
                 </div>
             </div>
 
@@ -733,7 +776,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT GLOBAL COMPLETO Y SEGURO -->
+    <!-- JAVASCRIPT GLOBAL COMPLETO -->
     <script>
         const defaultSiteConfig = {
             artistName: "Valeria Vance",
@@ -757,6 +800,9 @@
                 id: "sculpture-1",
                 title: "Silencio Absoluto",
                 price: 3200,
+                shippingRates: { es: 35, eu: 60, uk: 85, us: 140 },
+                packaging: 35,
+                showNotice: true,
                 status: "available",
                 tech: "Bronce con pátina negra",
                 year: "2024",
@@ -770,6 +816,9 @@
                 id: "sculpture-2",
                 title: "Tensión en Blanco",
                 price: 4500,
+                shippingRates: { es: 70, eu: 120, uk: 160, us: 280 },
+                packaging: 50,
+                showNotice: true,
                 status: "reserved",
                 tech: "Talla directa en Mármol de Carrara",
                 year: "2024",
@@ -783,6 +832,9 @@
                 id: "sculpture-3",
                 title: "Viento del Sur",
                 price: 2800,
+                shippingRates: { es: 0, eu: 0, uk: 0, us: 0 },
+                packaging: 0,
+                showNotice: false,
                 status: "sold",
                 tech: "Terracota refractaria y óxidos",
                 year: "2023",
@@ -1039,6 +1091,9 @@
                     statusBadge = '<span class="bg-stone-200 text-stone-700 text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full">Colección Privada</span>';
                 }
 
+                const shippingNoticeBadge = item.showNotice ? 
+                    `<div class="mt-1 text-[10px] text-amber-700 font-semibold flex items-center space-x-1"><i class="fa-solid fa-triangle-exclamation"></i><span>Envío / embalaje no incluido</span></div>` : '';
+
                 card.innerHTML = `
                     <div>
                         ${isAdminMode ? `
@@ -1054,6 +1109,7 @@
                             <span class="text-[11px] font-mono text-stone-400 uppercase tracking-wider block mb-1">${item.tech} • ${item.year}</span>
                             <h4 class="font-serif text-xl font-bold text-stone-900 cursor-pointer" onclick="openDetailModal('${item.id}')">${item.title}</h4>
                             <p class="text-xs text-stone-500 mt-1">${item.dimensions}</p>
+                            ${shippingNoticeBadge}
                         </div>
                     </div>
                     <div class="px-5 pb-5 pt-2 flex items-center justify-between border-t border-stone-100">
@@ -1066,14 +1122,6 @@
                 `;
                 grid.appendChild(card);
             });
-        };
-
-        window.filterCategory = function(cat) {
-            currentFilter = cat;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.className = "filter-btn bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 px-4 py-2 rounded-full transition-colors");
-            const activeBtn = document.getElementById(`filter-${cat}`);
-            if (activeBtn) activeBtn.className = "filter-btn bg-stone-900 text-white px-4 py-2 rounded-full transition-colors";
-            window.renderGallery();
         };
 
         window.openDetailModal = function(id) {
@@ -1097,6 +1145,36 @@
             safeSetText('modal-weight', item.weight);
             safeSetText('modal-base', item.base);
             safeSetText('modal-description', item.description);
+
+            // Avisos y desglose de costes en el modal de detalle
+            const techBox = document.querySelector('#detail-modal .bg-stone-50');
+            if (techBox) {
+                const existingNotice = techBox.querySelector('.shipping-detail-row');
+                if (existingNotice) existingNotice.remove();
+
+                const rates = item.shippingRates || { es: item.shipping || 0, eu: item.shipping || 0, uk: item.shipping || 0, us: item.shipping || 0 };
+                const packVal = parseFloat(item.packaging) || 0;
+
+                let noticeHTML = '';
+                if (item.showNotice) {
+                    noticeHTML = `
+                        <div class="shipping-detail-row pt-2 border-t border-stone-200 mt-2 space-y-1">
+                            <div class="text-[11px] font-bold text-amber-800 flex items-center space-x-1">
+                                <i class="fa-solid fa-earth-americas"></i>
+                                <span>Envíos asegurados por destino:</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[11px] text-stone-600 font-mono">
+                                <div>🇪🇸 España: ${rates.es ? rates.es + '€' : 'Consultar'}</div>
+                                <div>🇪🇺 Europa: ${rates.eu ? rates.eu + '€' : 'Consultar'}</div>
+                                <div>🇬🇧 Reino Unido: ${rates.uk ? rates.uk + '€' : 'Consultar'}</div>
+                                <div>🇺🇸 EEUU: ${rates.us ? rates.us + '€' : 'Consultar'}</div>
+                            </div>
+                            ${packVal > 0 ? `<div class="flex justify-between text-stone-600 text-[11px] pt-1"><span>Embalaje específico:</span><span class="font-medium">+${packVal.toLocaleString('es-ES')} €</span></div>` : ''}
+                        </div>
+                    `;
+                    techBox.insertAdjacentHTML('beforeend', noticeHTML);
+                }
+            }
 
             const thumbsContainer = document.getElementById('modal-thumbnails');
             if (thumbsContainer) {
@@ -1125,27 +1203,28 @@
             if (modal) modal.classList.remove('hidden');
         };
 
-        window.closeDetailModal = function() {
-            const modal = document.getElementById('detail-modal');
-            if (modal) modal.classList.add('hidden');
-        };
-
-        window.closeDetailModal = function() {
-            document.getElementById('detail-modal').classList.add('hidden');
-        };
-
         window.openEditModal = function(id) {
             currentEditingId = id;
             const isEdit = !!id;
-            document.getElementById('edit-modal-title').textContent = isEdit ? 'Editar Escultura' : 'Agregar Nueva Escultura';
-            document.getElementById('delete-btn').style.display = isEdit ? 'block' : 'none';
+            const titleEl = document.getElementById('edit-modal-title');
+            if (titleEl) titleEl.textContent = isEdit ? 'Editar Escultura' : 'Agregar Nueva Escultura';
+            
+            const delBtn = document.getElementById('delete-btn');
+            if (delBtn) delBtn.style.display = isEdit ? 'block' : 'none';
 
             if (isEdit) {
                 const item = sculptures.find(s => s.id === id);
                 if (item) {
+                    const rates = item.shippingRates || { es: item.shipping || 0, eu: item.shipping || 0, uk: item.shipping || 0, us: item.shipping || 0 };
                     document.getElementById('edit-id').value = item.id;
                     document.getElementById('edit-title').value = item.title;
                     document.getElementById('edit-price').value = item.price;
+                    document.getElementById('edit-shipping-es').value = rates.es || 0;
+                    document.getElementById('edit-shipping-eu').value = rates.eu || 0;
+                    document.getElementById('edit-shipping-uk').value = rates.uk || 0;
+                    document.getElementById('edit-shipping-us').value = rates.us || 0;
+                    document.getElementById('edit-packaging').value = item.packaging || 0;
+                    document.getElementById('edit-shipping-notice').checked = !!item.showNotice;
                     document.getElementById('edit-status').value = item.status;
                     document.getElementById('edit-tech').value = item.tech;
                     document.getElementById('edit-year').value = item.year;
@@ -1158,12 +1237,14 @@
             } else {
                 document.getElementById('edit-form').reset();
                 document.getElementById('edit-id').value = '';
+                document.getElementById('edit-shipping-es').value = 0;
+                document.getElementById('edit-shipping-eu').value = 0;
+                document.getElementById('edit-shipping-uk').value = 0;
+                document.getElementById('edit-shipping-us').value = 0;
+                document.getElementById('edit-packaging').value = 0;
+                document.getElementById('edit-shipping-notice').checked = true;
             }
             document.getElementById('edit-modal').classList.remove('hidden');
-        };
-
-        window.closeEditModal = function() {
-            document.getElementById('edit-modal').classList.add('hidden');
         };
 
         window.saveSculpture = function(e) {
@@ -1173,6 +1254,14 @@
                 id: id,
                 title: document.getElementById('edit-title').value,
                 price: parseFloat(document.getElementById('edit-price').value) || 0,
+                shippingRates: {
+                    es: parseFloat(document.getElementById('edit-shipping-es').value) || 0,
+                    eu: parseFloat(document.getElementById('edit-shipping-eu').value) || 0,
+                    uk: parseFloat(document.getElementById('edit-shipping-uk').value) || 0,
+                    us: parseFloat(document.getElementById('edit-shipping-us').value) || 0
+                },
+                packaging: parseFloat(document.getElementById('edit-packaging').value) || 0,
+                showNotice: document.getElementById('edit-shipping-notice').checked,
                 status: document.getElementById('edit-status').value,
                 tech: document.getElementById('edit-tech').value,
                 year: document.getElementById('edit-year').value,
@@ -1192,8 +1281,19 @@
             window.closeEditModal();
         };
 
+        window.closeDetailModal = function() {
+            const modal = document.getElementById('detail-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.closeEditModal = function() {
+            const modal = document.getElementById('edit-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
         window.deleteCurrentSculpture = function() {
-            if (confirm('¿Deseas eliminar esta obra del catálogo?')) {
+            if (!currentEditingId) return;
+            if (confirm('¿Seguro que deseas eliminar esta obra de tu catálogo?')) {
                 sculptures = sculptures.filter(s => s.id !== currentEditingId);
                 try { localStorage.setItem('vance_sculptures', JSON.stringify(sculptures)); } catch(err) {}
                 window.renderGallery();
@@ -1202,12 +1302,15 @@
         };
 
         window.toggleCart = function() {
-            document.getElementById('cart-drawer').classList.toggle('translate-x-full');
+            const drawer = document.getElementById('cart-drawer');
+            if (drawer) drawer.classList.toggle('translate-x-full');
         };
 
         window.addToCart = function(id) {
             const item = sculptures.find(s => s.id === id);
-            if (item && !cart.some(c => c.id === id)) {
+            if (!item || item.status === 'sold') return;
+
+            if (!cart.some(c => c.id === id)) {
                 cart.push(item);
                 window.updateCartUI();
             }
@@ -1223,20 +1326,35 @@
             document.getElementById('cart-count').textContent = cart.length;
             const container = document.getElementById('cart-items');
             container.innerHTML = '';
+            
+            const dest = document.getElementById('cart-destination')?.value || 'eu';
+            
             let subtotal = 0;
+            let totalShipping = 0;
+            let totalPackaging = 0;
 
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-center text-stone-400 text-sm py-8">Tu carrito está vacío.</p>';
             } else {
                 cart.forEach(item => {
+                    const rates = item.shippingRates || { es: item.shipping || 0, eu: item.shipping || 0, uk: item.shipping || 0, us: item.shipping || 0 };
+                    const itemShipping = parseFloat(rates[dest]) || 0;
+                    const itemPackaging = parseFloat(item.packaging) || 0;
+
                     subtotal += item.price;
+                    totalShipping += itemShipping;
+                    totalPackaging += itemPackaging;
+
                     const el = document.createElement('div');
                     el.className = "flex items-center space-x-3 pb-3 border-b border-stone-100";
                     el.innerHTML = `
                         <img src="${item.image.split(',')[0]}" class="w-12 h-12 object-cover rounded">
                         <div class="flex-grow">
                             <h5 class="font-serif text-sm font-bold text-stone-900">${item.title}</h5>
-                            <span class="text-xs text-stone-500">${item.price.toLocaleString('es-ES')} €</span>
+                            <div class="text-xs text-stone-500">
+                                <span>${item.price.toLocaleString('es-ES')} €</span>
+                                ${(itemShipping || itemPackaging) ? `<span class="text-[10px] text-amber-700 block">+${(itemShipping + itemPackaging).toLocaleString('es-ES')} € (Envío & embalaje)</span>` : ''}
+                            </div>
                         </div>
                         <button onclick="removeFromCart('${item.id}')" class="text-stone-400 hover:text-red-600 text-sm">
                             <i class="fa-solid fa-trash"></i>
@@ -1246,15 +1364,18 @@
                 });
             }
 
-            const shippingCost = parseFloat(document.getElementById('cart-shipping-cost')?.value) || 0;
-            const packagingCost = parseFloat(document.getElementById('cart-packaging-cost')?.value) || 0;
             const isSpecialBox = document.getElementById('cart-special-box')?.checked || false;
             const specialBoxCost = isSpecialBox ? 45 : 0;
-
-            const total = cart.length > 0 ? (subtotal + shippingCost + packagingCost + specialBoxCost) : 0;
+            const total = cart.length > 0 ? (subtotal + totalShipping + totalPackaging + specialBoxCost) : 0;
 
             const subtotalEl = document.getElementById('cart-subtotal');
             if (subtotalEl) subtotalEl.textContent = subtotal.toLocaleString('es-ES') + ' €';
+
+            const shippingEl = document.getElementById('cart-shipping-total');
+            if (shippingEl) shippingEl.textContent = totalShipping.toLocaleString('es-ES') + ' €';
+
+            const packagingEl = document.getElementById('cart-packaging-total');
+            if (packagingEl) packagingEl.textContent = totalPackaging.toLocaleString('es-ES') + ' €';
 
             const totalEl = document.getElementById('cart-total');
             if (totalEl) totalEl.textContent = total.toLocaleString('es-ES') + ' €';
@@ -1266,24 +1387,31 @@
                 return;
             }
             const cfg = { ...defaultSiteConfig, ...siteConfig };
+            const dest = document.getElementById('cart-destination')?.value || 'eu';
+            const destNames = { es: 'España (Península e Islas)', eu: 'Europa (Unión Europea)', uk: 'Reino Unido (UK)', us: 'Estados Unidos (EEUU)' };
+            const destName = destNames[dest] || dest;
+
             const subtotal = cart.reduce((t, c) => t + c.price, 0);
-            const shippingCost = parseFloat(document.getElementById('cart-shipping-cost')?.value) || 0;
-            const packagingCost = parseFloat(document.getElementById('cart-packaging-cost')?.value) || 0;
+            const totalShipping = cart.reduce((t, c) => {
+                const rates = c.shippingRates || { es: c.shipping || 0, eu: c.shipping || 0, uk: c.shipping || 0, us: c.shipping || 0 };
+                return t + (parseFloat(rates[dest]) || 0);
+            }, 0);
+            const totalPackaging = cart.reduce((t, c) => t + (parseFloat(c.packaging) || 0), 0);
             const isSpecialBox = document.getElementById('cart-special-box')?.checked || false;
             const specialBoxCost = isSpecialBox ? 45 : 0;
-            const total = subtotal + shippingCost + packagingCost + specialBoxCost;
+            const total = subtotal + totalShipping + totalPackaging + specialBoxCost;
 
             const titles = cart.map(c => c.title).join(', ');
             
-            let extraDetails = [];
-            if (shippingCost > 0) extraDetails.push(`Portes: ${shippingCost}€`);
-            if (packagingCost > 0) extraDetails.push(`Embalaje: ${packagingCost}€`);
-            if (isSpecialBox) extraDetails.push(`Caja de madera especial: ${specialBoxCost}€`);
-            const extraText = extraDetails.length > 0 ? `\n\nAdicionales: ${extraDetails.join(', ')}` : '';
+            let extraDetails = [`Destino seleccionado: ${destName}`];
+            if (totalShipping > 0) extraDetails.push(`Portes (${destName}): ${totalShipping}€`);
+            if (totalPackaging > 0) extraDetails.push(`Embalaje específico: ${totalPackaging}€`);
+            if (isSpecialBox) extraDetails.push(`Caja de madera reforzada: ${specialBoxCost}€`);
+            const extraText = `\n\nDesglose de envío:\n` + extraDetails.map(d => `• ${d}`).join('\n');
 
             if (method === 'wa') {
                 const lines = cart.map(c => `• ${c.title} (${c.tech}) — ${c.price.toLocaleString('es-ES')} €`).join('\n');
-                const msg = `Hola, me gustaría reservar las siguientes esculturas de tu catálogo:\n\n${lines}${extraText}\n\nTotal Final: ${total.toLocaleString('es-ES')} €\n\n¿Podrías indicarme los detalles de pago y entrega?`;
+                const msg = `Hola, me gustaría reservar las siguientes esculturas de tu catálogo:\n\n${lines}${extraText}\n\nTotal Final: ${total.toLocaleString('es-ES')} €\n\n¿Podrías indicarme los detalles de pago y entrega para ${destName}?`;
                 const phone = cfg.bizumPhone ? cfg.bizumPhone.replace(/\D/g, '') : '';
                 if (phone) {
                     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -1293,7 +1421,7 @@
             } else if (method === 'bizum') {
                 document.getElementById('bizum-modal-amount').textContent = total.toLocaleString('es-ES') + ' €';
                 document.getElementById('bizum-modal-phone').textContent = cfg.bizumPhone || '+34 600 000 000';
-                document.getElementById('bizum-modal-concept').textContent = 'Reserva: ' + titles;
+                document.getElementById('bizum-modal-concept').textContent = 'Reserva: ' + titles + ' (' + destName + ')';
                 document.getElementById('payment-bizum-modal').classList.remove('hidden');
             } else if (method === 'paypal') {
                 document.getElementById('paypal-modal-amount').textContent = total.toLocaleString('es-ES') + ' €';
@@ -1305,7 +1433,7 @@
                 document.getElementById('bank-modal-amount').textContent = total.toLocaleString('es-ES') + ' €';
                 document.getElementById('bank-modal-holder').textContent = cfg.bankHolder || cfg.artistName || 'Valeria Vance Studio';
                 document.getElementById('bank-modal-iban').textContent = cfg.bankIban || 'ES91 0000 0000 0000 0000 0000';
-                document.getElementById('bank-modal-concept').textContent = 'Reserva: ' + titles;
+                document.getElementById('bank-modal-concept').textContent = 'Reserva: ' + titles + ' (' + destName + ')';
                 document.getElementById('payment-bank-modal').classList.remove('hidden');
             }
         };
