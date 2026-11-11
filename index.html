@@ -118,7 +118,7 @@
             <!-- CONTROLES MODOS & CARRITO -->
             <div class="flex items-center space-x-4">
                 <!-- SELECTOR CLIENTE / ADMIN -->
-                <div class="flex items-center bg-stone-100 p-1 rounded-full border border-stone-300 shadow-inner">
+                <div id="mode-switch" class="hidden items-center bg-stone-100 p-1 rounded-full border border-stone-300 shadow-inner">
                     <button id="mode-btn-client" onclick="setMode(false)" class="px-3 py-1 text-xs font-medium bg-stone-900 text-white rounded-full shadow-sm transition-all">
                         <i class="fa-solid fa-eye text-[10px] mr-1"></i> Vista Cliente
                     </button>
@@ -182,9 +182,22 @@
                 <button onclick="filterCategory('sold')" id="filter-sold" class="filter-btn bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 px-4 py-2 rounded-full transition-colors">
                     Vendidas / Colección Privada
                 </button>
+                <button onclick="filterCategory('fav')" id="filter-fav" class="filter-btn bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 px-4 py-2 rounded-full transition-colors">
+                    <i class="fa-regular fa-heart mr-1"></i> Favoritas
+                </button>
             </div>
         </div>
 
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+            <input id="search-input" oninput="renderGallery()" type="search" placeholder="Buscar por título, material, año…" class="flex-1 px-4 py-2.5 bg-white border border-stone-300 rounded-full text-sm focus:ring-2 focus:ring-stone-900 focus:outline-none">
+            <select id="sort-select" onchange="renderGallery()" class="px-4 py-2.5 bg-white border border-stone-300 rounded-full text-sm focus:outline-none">
+                <option value="recent">Orden: más recientes</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="title">Título A–Z</option>
+            </select>
+        </div>
+        <p id="result-count" class="text-xs text-stone-500 mb-6"></p>
         <!-- GRILLA DE ESCULTURAS -->
         <div id="sculptures-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Las tarjetas de escultura se cargan dinámicamente -->
@@ -577,7 +590,7 @@
                 <p class="text-xs text-stone-500 mt-1">Introduce la clave para editar las obras.</p>
             </div>
             <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
-                <input type="password" id="admin-pass-input" placeholder="Contraseña (Por defecto: 1234)" required class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm text-center">
+                <input type="password" id="admin-pass-input" placeholder="Contraseña" required class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm text-center">
                 <button type="submit" class="w-full bg-stone-900 text-white py-2.5 rounded-md text-xs uppercase font-semibold tracking-wider hover:bg-stone-800">
                     Acceder
                 </button>
@@ -1031,7 +1044,7 @@
                 document.getElementById('admin-pass-input').value = '';
                 window.updateAdminUI();
             } else {
-                alert('Contraseña incorrecta (Por defecto: 1234)');
+                alert('Contraseña incorrecta');
             }
         };
 
@@ -1064,12 +1077,21 @@
             if (!grid) return;
             grid.innerHTML = '';
 
+            const q = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const sortV = document.getElementById('sort-select')?.value || 'recent';
             const items = sculptures.filter(item => {
-                if (currentFilter === 'available') return item.status === 'available';
-                if (currentFilter === 'reserved') return item.status === 'reserved';
-                if (currentFilter === 'sold') return item.status === 'sold';
-                return true;
+                if (currentFilter === 'available' && item.status !== 'available') return false;
+                if (currentFilter === 'reserved' && item.status !== 'reserved') return false;
+                if (currentFilter === 'sold' && item.status !== 'sold') return false;
+                if (currentFilter === 'fav' && !favs.includes(item.id)) return false;
+                return !q || [item.title, item.tech, item.year, item.description, item.dimensions].join(' ').toLowerCase().includes(q);
             });
+            if (sortV === 'price-asc') items.sort((a, b) => a.price - b.price);
+            else if (sortV === 'price-desc') items.sort((a, b) => b.price - a.price);
+            else if (sortV === 'title') items.sort((a, b) => a.title.localeCompare(b.title, 'es'));
+            else items.sort((a, b) => String(b.year).localeCompare(String(a.year)));
+            const rc = document.getElementById('result-count');
+            if (rc) rc.textContent = items.length + (items.length === 1 ? ' obra' : ' obras');
 
             if (items.length === 0) {
                 grid.innerHTML = '<div class="col-span-full text-center py-12 text-stone-400">No hay obras en esta sección.</div>';
@@ -1103,6 +1125,7 @@
                         ` : ''}
                         <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden cursor-pointer" onclick="openDetailModal('${item.id}')">
                             <img src="${mainPhoto}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <button onclick="event.stopPropagation();toggleFav('${item.id}')" class="absolute top-3 left-3 z-10 bg-white/90 w-8 h-8 rounded-full shadow flex items-center justify-center hover:scale-110 transition-transform" title="Guardar en favoritas" aria-label="Favorita"><i class="${favs.includes(item.id) ? 'fa-solid text-rose-600' : 'fa-regular text-stone-700'} fa-heart text-sm"></i></button>
                             <div class="absolute bottom-3 left-3">${statusBadge}</div>
                         </div>
                         <div class="p-5">
@@ -1498,6 +1521,85 @@
                 sculptures = [...initialSculptures];
             }
             window.renderGallery();
+        });
+    </script>
+
+    <div id="lightbox" class="fixed inset-0 z-[60] hidden bg-black/90 items-center justify-center p-4 cursor-zoom-out" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-full object-contain">
+    </div>
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] bg-stone-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity"></div>
+
+    <script>
+        // ===== MEJORAS: favoritas, filtros, compartir y zoom =====
+        let favs = [];
+        try { favs = JSON.parse(localStorage.getItem('vance_favs') || '[]'); } catch (e) {}
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.style.opacity = 1;
+            clearTimeout(toast._t); toast._t = setTimeout(() => t.style.opacity = 0, 2400);
+        }
+        function toggleFav(id) {
+            favs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
+            try { localStorage.setItem('vance_favs', JSON.stringify(favs)); } catch (e) {}
+            toast(favs.includes(id) ? 'Guardada en favoritas' : 'Quitada de favoritas');
+            renderGallery();
+        }
+        window.filterCategory = function (cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                const on = b.id === 'filter-' + cat;
+                b.className = 'filter-btn px-4 py-2 rounded-full transition-colors ' +
+                    (on ? 'bg-stone-900 text-white' : 'bg-white border border-stone-300 text-stone-700 hover:bg-stone-100');
+            });
+            renderGallery();
+        };
+
+        const _openDetail = window.openDetailModal;
+        window.openDetailModal = function (id) {
+            _openDetail(id);
+            const a = document.getElementById('modal-actions');
+            if (a) a.insertAdjacentHTML('beforeend', `<button onclick="shareSculpture('${id}')" class="w-full mt-2 border border-stone-300 text-stone-700 py-2.5 rounded-md text-xs uppercase font-semibold tracking-wider hover:bg-stone-100"><i class="fa-solid fa-share-nodes mr-1"></i> Compartir esta obra</button>`);
+            const im = document.getElementById('modal-image');
+            if (im) { im.style.cursor = 'zoom-in'; im.onclick = () => openLightbox(im.src); }
+            history.replaceState(null, '', '#obra-' + id);
+        };
+        const _closeDetail = window.closeDetailModal;
+        window.closeDetailModal = function () {
+            _closeDetail();
+            if (location.hash.startsWith('#obra-')) history.replaceState(null, '', location.pathname + location.search);
+        };
+        async function shareSculpture(id) {
+            const s = sculptures.find(x => x.id === id); if (!s) return;
+            const url = location.href.split('#')[0] + '#obra-' + id;
+            try {
+                if (navigator.share) await navigator.share({ title: s.title, text: s.title + ' — ' + s.tech, url });
+                else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); }
+            } catch (e) {}
+        }
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            const l = document.getElementById('lightbox'); l.classList.remove('hidden'); l.classList.add('flex');
+        }
+        function closeLightbox() {
+            const l = document.getElementById('lightbox'); l.classList.add('hidden'); l.classList.remove('flex');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            closeLightbox(); closeDetailModal();
+        });
+        // El selector Admin queda oculto para los visitantes: solo aparece al entrar con /#admin
+        function checkAdminLink() {
+            const sw = document.getElementById('mode-switch');
+            if (!sw) return;
+            const on = location.hash === '#admin';
+            sw.classList.toggle('hidden', !on);
+            sw.classList.toggle('flex', on);
+        }
+        window.addEventListener('hashchange', checkAdminLink);
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAdminLink();
+            if (location.hash.startsWith('#obra-')) openDetailModal(location.hash.slice(6));
         });
     </script>
 </body>
