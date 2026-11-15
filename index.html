@@ -1622,7 +1622,7 @@
         appId: "1:414648981473:web:a1da890bf8efd1d7f764a0"
     };
     // 2) Email del usuario administrador que creaste en Firebase Authentication.
-    const ADMIN_EMAIL = "agustinperezesculturas@gmail.com";
+    const ADMIN_EMAIL = "apcast@gmail.com";
 
     // --- Subida de fotos desde el dispositivo (funciona con o sin Firebase) ---
     window.uploadImages = function (input) {
@@ -1725,7 +1725,7 @@
                 document.getElementById('password-modal').classList.add('hidden');
                 document.getElementById('admin-pass-input').value = '';
                 updateAdminUI();
-            } catch (err) { alert('Contraseña incorrecta'); }
+            } catch (err) { console.warn(err); alert('No se pudo iniciar sesión (' + (err.code || err.message) + ').'); }
         };
         const _mode = window.setMode;
         window.setMode = function (on) {
