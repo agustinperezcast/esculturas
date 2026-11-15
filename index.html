@@ -82,6 +82,7 @@
             </button>
             <button onclick="exportData()" class="bg-white text-amber-900 hover:bg-amber-50 px-2.5 py-1 rounded font-semibold" title="Descargar copia de seguridad"><i class="fa-solid fa-download mr-1"></i> Copia</button>
             <button onclick="document.getElementById('import-file').click()" class="bg-white text-amber-900 hover:bg-amber-50 px-2.5 py-1 rounded font-semibold" title="Restaurar copia"><i class="fa-solid fa-upload mr-1"></i> Restaurar</button>
+            <button id="cloud-push-btn" onclick="pushAllToCloud()" class="hidden bg-white text-amber-900 hover:bg-amber-50 px-2.5 py-1 rounded font-semibold" title="Publicar todo en la base de datos"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Subir todo a la nube</button>
             <input type="file" id="import-file" accept="application/json" class="hidden" onchange="importData(this)">
             <button onclick="openChangePasswordModal()" class="text-white hover:text-amber-100 underline font-semibold px-2">
                 <i class="fa-solid fa-key mr-1"></i> Clave
@@ -692,6 +693,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-stone-700 mb-1">Fotos (URLs separadas por comas)</label>
+                        <input type="file" accept="image/*" multiple onchange="uploadImages(this)" class="mb-2 text-xs block">
                         <input type="text" id="edit-image" required placeholder="https://foto1.jpg, https://foto2.jpg" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm">
                     </div>
                     <div class="sm:col-span-2">
@@ -865,6 +867,10 @@
         let currentFilter = 'all';
         let isAdminMode = false;
         let currentEditingId = null;
+
+        window.splitImgs = function(str) {
+            return String(str || '').split(/,(?=\s*(?:https?:|data:|[\w\-./%]+\.(?:jpe?g|png|webp|gif|avif)\b))/i).map(x => x.trim()).filter(Boolean);
+        };
 
         // CONFIGURACIÓN TEXTOS WEB
         window.loadSiteConfig = function() {
@@ -1099,7 +1105,7 @@
             }
 
             items.forEach(item => {
-                const photos = item.image.split(',').map(s => s.trim());
+                const photos = splitImgs(item.image);
                 const mainPhoto = photos[0];
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-lg overflow-hidden border border-stone-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative group";
@@ -1156,7 +1162,7 @@
                 if (el) el.textContent = text;
             };
 
-            const photos = item.image.split(',').map(s => s.trim());
+            const photos = splitImgs(item.image);
             const imgEl = document.getElementById('modal-image');
             if (imgEl) imgEl.src = photos[0];
 
@@ -1371,7 +1377,7 @@
                     const el = document.createElement('div');
                     el.className = "flex items-center space-x-3 pb-3 border-b border-stone-100";
                     el.innerHTML = `
-                        <img src="${item.image.split(',')[0]}" class="w-12 h-12 object-cover rounded">
+                        <img src="${splitImgs(item.image)[0]}" class="w-12 h-12 object-cover rounded">
                         <div class="flex-grow">
                             <h5 class="font-serif text-sm font-bold text-stone-900">${item.title}</h5>
                             <div class="text-xs text-stone-500">
@@ -1601,6 +1607,137 @@
             checkAdminLink();
             if (location.hash.startsWith('#obra-')) openDetailModal(location.hash.slice(6));
         });
+    </script>
+
+    <style>body.cloud-loading #sculptures-grid{visibility:hidden}</style>
+    <script type="module">
+    // ============ FIREBASE (base de datos compartida) ============
+    // 1) Pega aquí la configuración de tu app web de Firebase (Configuración del proyecto → Tus apps).
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyAoJ-lKXGREkQ8MzMdylFC9LWGixonaBnc",
+        authDomain: "studio-9991146178-8f327.firebaseapp.com",
+        projectId: "studio-9991146178-8f327",
+        storageBucket: "studio-9991146178-8f327.firebasestorage.app",
+        messagingSenderId: "414648981473",
+        appId: "1:414648981473:web:a1da890bf8efd1d7f764a0"
+    };
+    // 2) Email del usuario administrador que creaste en Firebase Authentication.
+    const ADMIN_EMAIL = "agustinperezesculturas@gmail.com";
+
+    // --- Subida de fotos desde el dispositivo (funciona con o sin Firebase) ---
+    window.uploadImages = function (input) {
+        const files = [...input.files]; if (!files.length) return;
+        const field = document.getElementById('edit-image');
+        let pending = files.length;
+        files.forEach(file => {
+            const r = new FileReader();
+            r.onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                    const k = Math.min(1, 900 / Math.max(img.width, img.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    const url = c.toDataURL('image/jpeg', 0.72);
+                    field.value = field.value.trim() ? field.value.trim() + ', ' + url : url;
+                    if (--pending === 0) { input.value = ''; window.toast && toast('Fotos cargadas'); }
+                };
+                img.src = r.result;
+            };
+            r.readAsDataURL(file);
+        });
+    };
+
+    if (FIREBASE_CONFIG.apiKey && ADMIN_EMAIL) {
+        document.body.classList.add('cloud-loading');
+        setTimeout(() => document.body.classList.remove('cloud-loading'), 5000);
+        const V = 'https://www.gstatic.com/firebasejs/10.14.1/';
+        const { initializeApp } = await import(V + 'firebase-app.js');
+        const { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } = await import(V + 'firebase-firestore.js');
+        const { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } = await import(V + 'firebase-auth.js');
+        const app = initializeApp(FIREBASE_CONFIG);
+        const db = getFirestore(app), auth = getAuth(app);
+
+        const sj = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v)
+            ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
+        let cloudJSON = {}, latestScs = null, latestCfg = null, cloudReady = false;
+        document.getElementById('cloud-push-btn')?.classList.remove('hidden');
+
+        function apply() {
+            if (!cloudReady) return;
+            if (latestScs) { sculptures = latestScs; renderGallery(); }
+            if (latestCfg) { siteConfig = { ...defaultSiteConfig, ...latestCfg }; applySiteConfigUI(); }
+        }
+        onSnapshot(collection(db, 'esculturas'), snap => {
+            latestScs = snap.docs.map(d => d.data());
+            cloudJSON = {}; latestScs.forEach(x => cloudJSON[x.id] = sj(x));
+            apply();
+        }, err => console.warn('Firestore:', err));
+        onSnapshot(doc(db, 'web', 'config'), snap => {
+            cloudReady = snap.exists();
+            if (cloudReady) { latestCfg = snap.data(); delete latestCfg._ready; }
+            document.body.classList.remove('cloud-loading');
+            apply();
+        }, err => { document.body.classList.remove('cloud-loading'); console.warn('Firestore:', err); });
+
+        async function syncSculptures() {
+            if (!auth.currentUser) return;
+            if (!cloudReady) { alert('Pulsa primero "Subir todo a la nube" para activar la base de datos.'); return; }
+            try {
+                const ids = new Set(sculptures.map(x => x.id));
+                for (const x of sculptures) {
+                    const j = sj(x);
+                    if (cloudJSON[x.id] === j) continue;
+                    if (j.length > 950000) { alert('"' + x.title + '" pesa demasiado (fotos). Quita alguna foto o usa menos fotos.'); continue; }
+                    await setDoc(doc(db, 'esculturas', x.id), JSON.parse(j));
+                }
+                for (const id of Object.keys(cloudJSON)) if (!ids.has(id)) await deleteDoc(doc(db, 'esculturas', id));
+            } catch (err) { alert('No se pudo guardar en la nube: ' + err.message); }
+        }
+        const _save = window.saveSculpture;
+        window.saveSculpture = function (e) { _save(e); syncSculptures(); };
+        const _del = window.deleteCurrentSculpture;
+        window.deleteCurrentSculpture = function () { _del(); syncSculptures(); };
+        const _cfg = window.saveSiteConfig;
+        window.saveSiteConfig = function (e) {
+            _cfg(e);
+            if (cloudReady && auth.currentUser) setDoc(doc(db, 'web', 'config'), { ...siteConfig, _ready: true }).catch(err => alert('No se pudo guardar: ' + err.message));
+        };
+        window.pushAllToCloud = async function () {
+            if (!auth.currentUser) { alert('Primero inicia sesión en Admin.'); return; }
+            if (!confirm('¿Publicar en la nube todas las obras y textos actuales? Sustituirá lo que haya publicado.')) return;
+            try {
+                const ids = new Set(sculptures.map(x => x.id));
+                for (const x of sculptures) await setDoc(doc(db, 'esculturas', x.id), JSON.parse(sj(x)));
+                for (const id of Object.keys(cloudJSON)) if (!ids.has(id)) await deleteDoc(doc(db, 'esculturas', id));
+                await setDoc(doc(db, 'web', 'config'), { ...siteConfig, _ready: true });
+                toast('Publicado en la nube');
+            } catch (err) { alert('No se pudo publicar: ' + err.message); }
+        };
+
+        // Acceso admin real (Firebase Authentication)
+        window.verifyAdminPassword = async function (e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass-input').value;
+            try {
+                await signInWithEmailAndPassword(auth, ADMIN_EMAIL, pass);
+                isAdminMode = true;
+                document.getElementById('password-modal').classList.add('hidden');
+                document.getElementById('admin-pass-input').value = '';
+                updateAdminUI();
+            } catch (err) { alert('Contraseña incorrecta'); }
+        };
+        const _mode = window.setMode;
+        window.setMode = function (on) {
+            if (on && auth.currentUser) { isAdminMode = true; updateAdminUI(); }
+            else _mode(on);
+        };
+        window.openChangePasswordModal = async function () {
+            if (!confirm('Te enviaremos un email a ' + ADMIN_EMAIL + ' para cambiar la contraseña. ¿Continuar?')) return;
+            try { await sendPasswordResetEmail(auth, ADMIN_EMAIL); toast('Email enviado'); }
+            catch (err) { alert('No se pudo enviar el email: ' + err.message); }
+        };
+    }
     </script>
 </body>
 </html>
